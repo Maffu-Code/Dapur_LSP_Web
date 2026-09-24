@@ -1,0 +1,70 @@
+{% extends "kerangka_app.html" %}
+
+{% comment %}
+Daftar kategori produk (AD10).
+
+Kategori yang masih dipakai produk tidak dapat dihapus. Jumlah produk
+per kategori ditampilkan supaya Administrator tahu alasannya sebelum
+mencoba menghapus.
+{% endcomment %}
+
+{% block judul %}Kategori Produk{% endblock %}
+{% block bilah %}Kelola Kategori Produk{% endblock %}
+
+{% block aksi %}
+  <a href="{% url 'core:kelola_kategori_tambah' %}" class="btn btn-utama">
+    Tambah Kategori
+  </a>
+{% endblock %}
+
+{% block isi %}
+
+  <div class="kartu">
+    <div class="kartu-kepala">
+      <h2>Daftar Kategori</h2>
+      <span class="teks-kecil teks-redup">
+        Studi kasus menetapkan 3 kategori: Makanan Utama, Appetizer, Minuman
+      </span>
+    </div>
+
+    {% if kategori_list %}
+      <div class="tabel-gulir">
+        <table class="tabel-rapi">
+          <thead>
+            <tr>
+              <th>Nama Kategori</th>
+              <th>Tipe</th>
+              <th class="angka">Jumlah Produk</th>
+              <th class="text-end">Tindakan</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for kategori in kategori_list %}
+              <tr>
+                <td class="fw-semibold">{{ kategori.nama }}</td>
+                <td><span class="lencana">{{ kategori.tipe }}</span></td>
+                <td class="angka">{{ kategori.produk_list.count }}</td>
+                <td class="text-end">
+                  <div class="d-flex gap-1 justify-content-end flex-wrap">
+                    <a href="{% url 'core:kelola_kategori_ubah' kategori.pk %}"
+                       class="btn btn-garis btn-sm">Ubah</a>
+                    <a href="{% url 'core:kelola_kategori_hapus' kategori.pk %}"
+                       class="btn btn-bahaya btn-sm">Hapus</a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="keadaan-kosong">
+        <p class="keadaan-kosong__judul">Belum ada kategori</p>
+        <p class="mb-0">
+          Tambahkan kategori terlebih dahulu sebelum membuat produk.
+        </p>
+      </div>
+    {% endif %}
+  </div>
+
+{% endblock %}

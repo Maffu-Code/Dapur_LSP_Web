@@ -1,0 +1,73 @@
+{% extends "kerangka_app.html" %}
+
+{% comment %}
+Formulir input dan pembaruan stok satu produk (AD07).
+
+Nilai yang diisi adalah nilai akhir stok, bukan penambahan. Status
+Tersedia atau Habis ditentukan otomatis dari nilai tersebut, sehingga
+Administrator tidak perlu mengisinya sendiri.
+{% endcomment %}
+
+{% block judul %}Atur Stok {{ produk.nama }}{% endblock %}
+{% block bilah %}Atur Stok Produk{% endblock %}
+
+{% block aksi %}
+  <a href="{% url 'core:kelola_stok' %}" class="btn btn-garis">
+    Kembali ke Kelola Stok
+  </a>
+{% endblock %}
+
+{% block isi %}
+
+  <div class="kartu" style="max-width: 620px;">
+    <div class="kartu-kepala">
+      <div>
+        <h2 class="mb-0">{{ produk.nama }}</h2>
+        <span class="teks-kecil teks-redup">{{ produk.kategori.nama }}</span>
+      </div>
+      {% if produk.status_stok == "TERSEDIA" %}
+        <span class="lencana lencana-stok--tersedia">Tersedia</span>
+      {% else %}
+        <span class="lencana lencana-stok--habis">Habis</span>
+      {% endif %}
+    </div>
+
+    <form method="post" novalidate data-cegah-ganda>
+      {% csrf_token %}
+
+      <div class="kartu-isi">
+
+        <div class="ringkasan mb-3">
+          <span class="ringkasan__label">Stok Saat Ini</span>
+          <span class="uang-besar">{{ produk.stok }}</span>
+        </div>
+
+        <div class="mb-3">
+          <label for="{{ form.jumlah_stok.id_for_label }}" class="form-label">
+            {{ form.jumlah_stok.label }}
+          </label>
+          {{ form.jumlah_stok }}
+          <div class="form-text">
+            Isi nilai stok yang baru. Nilai ini menggantikan stok
+            sebelumnya, bukan menambah.
+          </div>
+          {% for galat in form.jumlah_stok.errors %}
+            <div class="pesan-galat">{{ galat }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="pesan-sistem pesan-sistem--ingat mb-0">
+          Isi 0 bila produk sedang habis. Status produk akan berubah
+          menjadi Habis secara otomatis.
+        </div>
+
+      </div>
+
+      <div class="kartu-kaki d-flex justify-content-end gap-2">
+        <a href="{% url 'core:kelola_stok' %}" class="btn btn-garis">Batal</a>
+        <button type="submit" class="btn btn-utama">Simpan Stok</button>
+      </div>
+    </form>
+  </div>
+
+{% endblock %}

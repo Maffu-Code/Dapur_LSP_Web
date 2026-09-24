@@ -1,0 +1,109 @@
+{% extends "kerangka_app.html" %}
+
+{% comment %}
+Formulir tambah dan ubah pengguna (AD11).
+
+Password wajib diisi saat menambah pengguna baru. Saat mengubah data,
+password boleh dikosongkan yang berarti password lama tetap dipakai.
+Password selalu disimpan dalam bentuk hash.
+{% endcomment %}
+
+{% block judul %}{{ aksi }} Pengguna{% endblock %}
+{% block bilah %}{{ aksi }} Pengguna{% endblock %}
+
+{% block aksi %}
+  <a href="{% url 'core:kelola_pengguna' %}" class="btn btn-garis">
+    Kembali ke Daftar Pengguna
+  </a>
+{% endblock %}
+
+{% block isi %}
+
+  <div class="kartu" style="max-width: 620px;">
+    <div class="kartu-kepala">
+      <h2>{{ aksi }} Data Pengguna</h2>
+    </div>
+
+    <form method="post" novalidate data-cegah-ganda>
+      {% csrf_token %}
+
+      <div class="kartu-isi">
+
+        {% for galat in form.non_field_errors %}
+          <div class="pesan-sistem pesan-sistem--gagal">{{ galat }}</div>
+        {% endfor %}
+
+        <div class="mb-3">
+          <label for="{{ form.username.id_for_label }}" class="form-label">
+            {{ form.username.label }}
+          </label>
+          {{ form.username }}
+          {% for galat in form.username.errors %}
+            <div class="pesan-galat">{{ galat }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          <label for="{{ form.nama.id_for_label }}" class="form-label">
+            {{ form.nama.label }}
+          </label>
+          {{ form.nama }}
+          {% for galat in form.nama.errors %}
+            <div class="pesan-galat">{{ galat }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          <label for="{{ form.role.id_for_label }}" class="form-label">
+            {{ form.role.label }}
+          </label>
+          {{ form.role }}
+          <div class="form-text">
+            Kasir menangani pesanan dan pembayaran. Administrator dapat
+            mengelola produk, kategori, stok, laporan, dan pengguna.
+          </div>
+          {% for galat in form.role.errors %}
+            <div class="pesan-galat">{{ galat }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          <label for="{{ form.password.id_for_label }}" class="form-label">
+            {{ form.password.label }}
+            {% if aksi == "Tambah" %}
+              <span class="teks-redup">(wajib diisi)</span>
+            {% else %}
+              <span class="teks-redup">(boleh dikosongkan)</span>
+            {% endif %}
+          </label>
+          {{ form.password }}
+          <div class="form-text">{{ form.password.help_text }}</div>
+          {% for galat in form.password.errors %}
+            <div class="pesan-galat">{{ galat }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="form-check">
+          {{ form.aktif }}
+          <label class="form-check-label" for="{{ form.aktif.id_for_label }}">
+            {{ form.aktif.label }}
+          </label>
+          <div class="form-text">
+            Hilangkan tanda ini untuk menutup akses akun tanpa
+            menghapus datanya.
+          </div>
+          {% for galat in form.aktif.errors %}
+            <div class="pesan-galat">{{ galat }}</div>
+          {% endfor %}
+        </div>
+
+      </div>
+
+      <div class="kartu-kaki d-flex justify-content-end gap-2">
+        <a href="{% url 'core:kelola_pengguna' %}" class="btn btn-garis">Batal</a>
+        <button type="submit" class="btn btn-utama">Simpan</button>
+      </div>
+    </form>
+  </div>
+
+{% endblock %}

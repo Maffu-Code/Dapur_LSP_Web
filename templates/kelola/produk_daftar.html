@@ -1,0 +1,126 @@
+{% extends "kerangka_app.html" %}
+
+{% comment %}
+Daftar produk untuk Administrator (AD09).
+
+Menampilkan seluruh produk beserta kategori, harga, stok, status
+ketersediaan, dan penanda aktif. Tersedia penyaring kategori dan
+pencarian nama produk.
+{% endcomment %}
+
+{% block judul %}Data Produk{% endblock %}
+{% block bilah %}Kelola Data Produk{% endblock %}
+
+{% block aksi %}
+  <a href="{% url 'core:kelola_produk_tambah' %}" class="btn btn-utama">
+    Tambah Produk
+  </a>
+{% endblock %}
+
+{% block isi %}
+
+  <form method="get" class="kartu kartu-isi mb-3">
+    <div class="row g-3 align-items-end">
+      <div class="col-12 col-md-4">
+        <label for="id_kategori" class="form-label">Kategori</label>
+        <select name="kategori" id="id_kategori" class="form-select">
+          <option value="">Semua Kategori</option>
+          {% for kategori in kategori_list %}
+            <option value="{{ kategori.pk }}"
+              {% if kategori_terpilih == kategori.pk|stringformat:"s" %}selected{% endif %}>
+              {{ kategori.nama }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-5">
+        <label for="id_cari" class="form-label">Cari Produk</label>
+        <input type="text" name="cari" id="id_cari" class="form-control"
+               value="{{ cari }}" placeholder="Contoh: nasi">
+      </div>
+      <div class="col-12 col-md-3 d-grid">
+        <button type="submit" class="btn btn-utama">Tampilkan</button>
+      </div>
+    </div>
+    {% if kategori_terpilih or cari %}
+      <div class="mt-3">
+        <a href="{% url 'core:kelola_produk' %}" class="teks-kecil">Hapus penyaring</a>
+      </div>
+    {% endif %}
+  </form>
+
+  <div class="kartu">
+    <div class="kartu-kepala">
+      <h2>Daftar Produk</h2>
+      <span class="teks-kecil teks-redup">
+        {{ produk_list|length }} produk ditampilkan
+      </span>
+    </div>
+
+    {% if produk_list %}
+      <div class="tabel-gulir">
+        <table class="tabel-rapi">
+          <thead>
+            <tr>
+              <th>Nama Produk</th>
+              <th>Kategori</th>
+              <th class="angka">Harga</th>
+              <th class="angka">Stok</th>
+              <th>Status Stok</th>
+              <th>Keadaan</th>
+              <th class="text-end">Tindakan</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for produk in produk_list %}
+              <tr>
+                <td class="fw-semibold">{{ produk.nama }}</td>
+                <td><span class="lencana">{{ produk.kategori.nama }}</span></td>
+                <td class="angka">Rp{{ produk.harga|floatformat:"0" }}</td>
+                <td class="angka">{{ produk.stok }}</td>
+                <td>
+                  {% if produk.status_stok == "TERSEDIA" %}
+                    <span class="lencana lencana-stok--tersedia">Tersedia</span>
+                  {% else %}
+                    <span class="lencana lencana-stok--habis">Habis</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if produk.aktif %}
+                    <span class="teks-kecil">Dijual</span>
+                  {% else %}
+                    <span class="lencana">Tidak dijual</span>
+                  {% endif %}
+                </td>
+                <td class="text-end">
+                  <div class="d-flex gap-1 justify-content-end flex-wrap">
+                    <a href="{% url 'core:kelola_stok_atur' produk.pk %}"
+                       class="btn btn-garis btn-sm">Stok</a>
+                    <a href="{% url 'core:kelola_produk_ubah' produk.pk %}"
+                       class="btn btn-garis btn-sm">Ubah</a>
+                    <a href="{% url 'core:kelola_produk_hapus' produk.pk %}"
+                       class="btn btn-bahaya btn-sm">Hapus</a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="keadaan-kosong">
+        <p class="keadaan-kosong__judul">Belum ada produk</p>
+        <p class="mb-0">
+          Belum ada produk yang sesuai dengan penyaring yang dipilih.
+        </p>
+      </div>
+    {% endif %}
+  </div>
+
+  <p class="teks-kecil teks-redup mt-3 mb-0">
+    Produk yang pernah dipesan tidak dapat dihapus. Untuk
+    menyembunyikannya dari menu, ubah produk lalu hilangkan tanda
+    Produk Aktif.
+  </p>
+
+{% endblock %}

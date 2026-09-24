@@ -1,0 +1,269 @@
+{% extends "kerangka_app.html" %}
+
+{% comment %}
+Halaman pembayaran untuk Kasir.
+
+Pesanan wajib dibayar sebelum diproses, jadi halaman ini dipakai kasir
+tepat setelah pelanggan memesan. Dua metode ditangani di sini:
+
+  Tunai
+    Kasir memasukkan jumlah uang diterima, sistem menghitung
+    kembalian, lalu pembayaran disimpan dan pesanan diteruskan ke
+    dapur.
+
+  QRIS
+    Halaman menampilkan kode QR dan status pembayarannya. Kasir harus
+    melihat status gateway menyatakan pembayaran berhasil sebelum
+    menekan tombol konfirmasi. Tombol konfirmasi memanggil
+    services.proses_pembayaran yang memeriksa ulang status tersebut,
+    sehingga pembayaran tidak dapat dikonfirmasi sebelum benar-benar
+    masuk.
+
+Tombol simulasi bayar hanya muncul saat gateway yang dipakai masih
+mockup, ditandai oleh gateway_simulasi. Dengan begitu halaman ini tidak
+perlu diubah ketika penyedia sungguhan sudah dipasang.
+{% endcomment %}
+
+{% block judul %}Pembayaran {{ pesanan.nomor_pesanan }}{% endblock %}
+{% block bilah %}Pembayaran{% endblock %}
+
+{% block aksi %}
+  <a href="{% url 'core:kasir_detail_pesanan' pesanan.pk %}" class="btn btn-garis">
+    Rincian Pesanan
+  </a>
+{% endblock %}
+
+{% block isi %}
+
+  <div class="row g-3">
+
+    {% comment %} Tagihan {% endcomment %}
+    <div class="col-12 col-lg-5">
+      <div class="kartu">
+        <div class="kartu-kepala">
+          <h2>Tagihan</h2>
+          <span class="lencana">Meja {{ pesanan.pelanggan.nomor_meja }}</span>
+        </div>
+
+        <div class="tabel-gulir">
+          <table class="tabel-rapi">
+            <thead>
+              <tr>
+                <th>Produk</th>
+                <th class="angka">Jumlah</th>
+                <th class="angka">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for detail in pesanan.detail_list.all %}
+                <tr>
+                  <td>{{ detail.produk.nama }}</td>
+                  <td class="angka">{{ detail.jumlah }}</td>
+                  <td class="angka">Rp{{ detail.hitung_subtotal_item|floatformat:"0" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="kartu-kaki">
+          <div class="ringkasan">
+            <span class="ringkasan__label">Subtotal</span>
+            <span class="uang">Rp{{ billing.subtotal|floatformat:"0" }}</span>
+          </div>
+          <div class="ringkasan">
+            <span class="ringkasan__label">Pajak 10 persen</span>
+            <span class="uang">Rp{{ billing.pajak|floatformat:"0" }}</span>
+          </div>
+          <div class="ringkasan ringkasan--total">
+            <span class="ringkasan__label">Total Tagihan</span>
+            <span class="uang-besar">Rp{{ billing.total|floatformat:"0" }}</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="teks-kecil teks-redup mt-3 mb-0">
+        Nomor pesanan {{ pesanan.nomor_pesanan }} atas nama
+        {{ pesanan.pelanggan.nama }}. Pelanggan memilih pembayaran
+        <strong>{{ pesanan.get_metode_dipilih_display }}</strong>.
+      </p>
+    </div>
+
+    <div class="col-12 col-lg-7">
+
+      {% if transaksi %}
+        {% comment %}
+          Alur QRIS. Status gateway ditampilkan paling atas karena
+          itulah yang harus diperiksa kasir sebelum mengonfirmasi.
+        {% endcomment %}
+        <div class="kartu mb-3">
+          <div class="kartu-kepala">
+            <h2>Pembayaran QRIS</h2>
+            <span class="lencana">{{ gateway_nama }}</span>
+          </div>
+
+          <div class="kartu-isi">
+
+            <div class="row g-3 align-items-center">
+              <div class="col-12 col-sm-5 text-center">
+                <img src="{{ qr_data_uri }}"
+                     alt="Kode QR pembayaran pesanan {{ pesanan.nomor_pesanan }}"
+                     width="190" height="190"
+                     style="border: 1px solid #d8dee6; border-radius: 8px; padding: 8px; background: #fff;">
+              </div>
+
+              <div class="col-12 col-sm-7">
+                <div class="ringkasan">
+                  <span class="ringkasan__label">Kode Bayar</span>
+                  <span class="fw-semibold">{{ transaksi.kode_bayar }}</span>
+                </div>
+                <div class="ringkasan">
+                  <span class="ringkasan__label">Jumlah</span>
+                  <span class="fw-semibold">Rp{{ transaksi.jumlah|floatformat:"0" }}</span>
+                </div>
+                <div class="ringkasan">
+                  <span class="ringkasan__label">Status Gateway</span>
+                  <span>
+                    {% if transaksi.status == "DIBAYAR" %}
+                      <span class="lencana lencana-stok--tersedia">Pembayaran Berhasil</span>
+                    {% elif transaksi.status == "KEDALUWARSA" %}
+                      <span class="lencana lencana-stok--habis">Kedaluwarsa</span>
+                    {% elif transaksi.status == "GAGAL" %}
+                      <span class="lencana lencana-stok--habis">Gagal</span>
+                    {% else %}
+                      <span class="lencana">Menunggu Pembayaran</span>
+                    {% endif %}
+                  </span>
+                </div>
+                <div class="ringkasan">
+                  <span class="ringkasan__label">Berlaku Sampai</span>
+                  <span>{{ transaksi.kedaluwarsa_pada|date:"H:i" }} WIB</span>
+                </div>
+              </div>
+            </div>
+
+            {% if transaksi.status == "DIBAYAR" %}
+              {% comment %}
+                Konfirmasi kasir. Pembayaran hanya tersimpan bila status
+                gateway memang sudah berhasil.
+              {% endcomment %}
+              <form method="post"
+                    action="{% url 'core:kasir_konfirmasi_qris' pesanan.pk %}"
+                    class="mt-3" data-cegah-ganda>
+                {% csrf_token %}
+                <button type="submit" class="btn btn-utama w-100">
+                  Konfirmasi Pembayaran Berhasil
+                </button>
+                <div class="form-text text-center mt-2">
+                  Pesanan diteruskan ke dapur setelah pembayaran
+                  dikonfirmasi.
+                </div>
+              </form>
+            {% else %}
+              <div class="pesan-sistem pesan-sistem--gagal mt-3">
+                Pembayaran belum dinyatakan berhasil oleh gateway.
+                Konfirmasi hanya dapat dilakukan setelah status gateway
+                berubah menjadi Pembayaran Berhasil.
+              </div>
+
+              {% if gateway_simulasi and transaksi.status == "MENUNGGU" %}
+                {% comment %}
+                  Tombol ini menggantikan peran aplikasi bank atau
+                  dompet digital pelanggan, dan hanya ada pada mockup.
+                {% endcomment %}
+                <form method="post"
+                      action="{% url 'core:simulasi_bayar_qris' pesanan.nomor_pesanan %}"
+                      class="mt-3" data-cegah-ganda>
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-garis w-100">
+                    Simulasikan Pelanggan Membayar
+                  </button>
+                </form>
+              {% endif %}
+            {% endif %}
+
+            <form method="post"
+                  action="{% url 'core:kasir_periksa_qris' pesanan.pk %}"
+                  class="mt-2">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-garis w-100">
+                Periksa Status ke Gateway
+              </button>
+            </form>
+
+          </div>
+        </div>
+
+      {% else %}
+        {% comment %}
+          Alur tunai. Kasir memasukkan uang yang diterima, sistem
+          menghitung kembalian.
+        {% endcomment %}
+        <form method="post" novalidate data-cegah-ganda data-pembayaran>
+          {% csrf_token %}
+
+          <div class="kartu">
+            <div class="kartu-kepala">
+              <h2>Data Pembayaran</h2>
+            </div>
+
+            <div class="kartu-isi">
+
+              <div class="mb-4">
+                <span class="form-label d-block">Metode Pembayaran</span>
+                {% for radio in form.metode %}
+                  <div class="form-check mb-2">
+                    {{ radio.tag }}
+                    <label class="form-check-label" for="{{ radio.id_for_label }}">
+                      {{ radio.choice_label }}
+                    </label>
+                  </div>
+                {% endfor %}
+                {% for galat in form.metode.errors %}
+                  <div class="pesan-galat">{{ galat }}</div>
+                {% endfor %}
+              </div>
+
+              <div data-blok-tunai>
+                <div class="mb-3">
+                  <label for="{{ form.jumlah_diterima.id_for_label }}" class="form-label">
+                    {{ form.jumlah_diterima.label }}
+                  </label>
+                  {{ form.jumlah_diterima }}
+                  <div class="form-text">
+                    Kembalian dihitung otomatis dari total tagihan
+                    Rp{{ billing.total|floatformat:"0" }}.
+                  </div>
+                  {% for galat in form.jumlah_diterima.errors %}
+                    <div class="pesan-galat">{{ galat }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div data-blok-qris>
+                <div class="pesan-sistem">
+                  Pembayaran QRIS diproses melalui kode QR dan
+                  dikonfirmasi setelah gateway menyatakan pembayaran
+                  berhasil. Pilih QRIS lalu simpan untuk membuat kode QR.
+                </div>
+              </div>
+
+              {% for galat in form.non_field_errors %}
+                <div class="pesan-sistem pesan-sistem--gagal">{{ galat }}</div>
+              {% endfor %}
+
+            </div>
+
+            <div class="kartu-kaki">
+              <button type="submit" class="btn btn-utama w-100">
+                Simpan Pembayaran
+              </button>
+            </div>
+          </div>
+        </form>
+      {% endif %}
+
+    </div>
+  </div>
+
+{% endblock %}

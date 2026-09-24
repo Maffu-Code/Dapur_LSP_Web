@@ -1,0 +1,15 @@
+# Dependensi Sistem Informasi Restoran Dapur Ina Aina
+# Pasang dengan: pip install -r requirements.txt
+#
+# Django dipakai sebagai framework utama (library pre-existing).
+# pytest dan pytest-django dipakai untuk pengujian unit pada Tugas 4.
+# reportlab dipakai untuk membuat tagihan PDF di sisi server.
+# qrcode dipakai untuk membuat kode QR pembayaran QRIS dalam bentuk SVG.
+# Pillow dibutuhkan reportlab, jadi ikut dipasang.
+
+Django==5.0.14
+pytest==9.1.1
+pytest-django==4.14.0
+reportlab==5.0.1
+qrcode==8.2
+pillow==12.3.0

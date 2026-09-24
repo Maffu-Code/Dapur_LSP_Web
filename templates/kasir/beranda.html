@@ -1,0 +1,77 @@
+{% extends "kerangka_app.html" %}
+
+{% comment %}
+Beranda Kasir: ringkasan pesanan hari ini.
+
+Angka ringkas ditampilkan supaya kasir langsung tahu berapa pesanan
+yang perlu ditindaklanjuti tanpa membuka daftar pesanan lebih dahulu.
+{% endcomment %}
+
+{% block judul %}Beranda Kasir{% endblock %}
+{% block bilah %}Beranda Kasir{% endblock %}
+
+{% block aksi %}
+  <a href="{% url 'core:kasir_pesanan' %}" class="btn btn-utama">Buka Daftar Pesanan</a>
+{% endblock %}
+
+{% block isi %}
+
+  <p class="teks-redup mb-3">
+    Ringkasan pesanan hari ini, {{ hari_ini|date:"d F Y" }}
+  </p>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="kartu kartu-isi h-100">
+        <div class="teks-kecil teks-redup mb-1">Pesanan Baru</div>
+        <div class="judul" style="font-size: 1.75rem;">{{ statistik.jumlah_baru }}</div>
+        <div class="teks-kecil teks-redup">Belum ditindaklanjuti</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="kartu kartu-isi h-100">
+        <div class="teks-kecil teks-redup mb-1">Sedang Diproses</div>
+        <div class="judul" style="font-size: 1.75rem;">{{ statistik.jumlah_diproses }}</div>
+        <div class="teks-kecil teks-redup">Sedang disiapkan dapur</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="kartu kartu-isi h-100">
+        <div class="teks-kecil teks-redup mb-1">Siap Dibayar</div>
+        <div class="judul" style="font-size: 1.75rem;">{{ statistik.jumlah_selesai }}</div>
+        <div class="teks-kecil teks-redup">Menunggu pembayaran</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="kartu kartu-isi h-100">
+        <div class="teks-kecil teks-redup mb-1">Sudah Dibayar</div>
+        <div class="judul" style="font-size: 1.75rem;">{{ statistik.jumlah_dibayar }}</div>
+        <div class="teks-kecil teks-redup">Transaksi selesai</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="kartu">
+    <div class="kartu-kepala">
+      <h2>Penjualan Hari Ini</h2>
+      <a href="{% url 'core:kasir_pesanan' %}?status=DIPROSES" class="teks-kecil">
+        Lihat pesanan yang diproses
+      </a>
+    </div>
+    <div class="kartu-isi">
+      <div class="ringkasan">
+        <span class="ringkasan__label">Jumlah pesanan dibatalkan</span>
+        <span class="uang">{{ statistik.jumlah_dibatalkan }}</span>
+      </div>
+      <div class="ringkasan ringkasan--total">
+        <span class="ringkasan__label">Total penjualan hari ini</span>
+        <span class="uang-besar">Rp{{ statistik.penjualan_hari_ini|floatformat:"0" }}</span>
+      </div>
+      <p class="teks-kecil teks-redup mb-0 mt-3">
+        Total penjualan dihitung dari pesanan berstatus Dibayar pada hari
+        ini, belum termasuk pajak yang belum dibayar.
+      </p>
+    </div>
+  </div>
+
+{% endblock %}

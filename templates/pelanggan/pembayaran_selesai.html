@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% comment %}
+Halaman setelah pembayaran pelanggan selesai.
+
+Halaman ini menegaskan bahwa pembayaran sudah diterima dan menampilkan
+ringkasan pesanan. Karena pembayaran sudah tuntas, pelanggan dapat
+meminta tagihan dicetak kepada kasir. Tautan unduh PDF hanya
+ditampilkan bila pengguna sedang login, sebab berkas tagihan dihasilkan
+melalui halaman kasir.
+
+Status pesanan tetap ditampilkan supaya pelanggan yang membuka halaman
+ini kembali dapat memantau apakah pesanannya sedang diproses atau sudah
+selesai.
+{% endcomment %}
+
+{% block judul %}Pembayaran Selesai{% endblock %}
+
+{% block isi %}
+
+  <div class="kartu mb-4" style="max-width: 620px; margin: 0 auto;">
+    <div class="kartu-isi text-center">
+
+      <span class="lencana lencana-stok--tersedia mb-3">Pembayaran Diterima</span>
+
+      <p class="teks-redup mb-2">Nomor Pesanan</p>
+      <p class="judul mb-4" style="font-size: 1.75rem; letter-spacing: 0.02em;">
+        {{ pesanan.nomor_pesanan }}
+      </p>
+
+      <div class="kartu kartu-isi text-start mb-4">
+        <div class="ringkasan">
+          <span class="ringkasan__label">Nama Pemesan</span>
+          <span class="fw-semibold">{{ pesanan.pelanggan.nama }}</span>
+        </div>
+        <div class="ringkasan">
+          <span class="ringkasan__label">Nomor Meja</span>
+          <span class="fw-semibold">{{ pesanan.pelanggan.nomor_meja }}</span>
+        </div>
+        <div class="ringkasan">
+          <span class="ringkasan__label">Metode Pembayaran</span>
+          <span>{{ pesanan.get_metode_dipilih_display }}</span>
+        </div>
+
+        {% if pembayaran %}
+          <div class="ringkasan">
+            <span class="ringkasan__label">Jumlah Dibayar</span>
+            <span class="fw-semibold">Rp{{ pembayaran.jumlah_diterima|floatformat:"0" }}</span>
+          </div>
+          {% if pembayaran.metode == "TUNAI" %}
+            <div class="ringkasan">
+              <span class="ringkasan__label">Kembalian</span>
+              <span>Rp{{ pembayaran.kembalian|floatformat:"0" }}</span>
+            </div>
+          {% endif %}
+          {% if pembayaran.nomor_referensi %}
+            <div class="ringkasan">
+              <span class="ringkasan__label">Nomor Referensi</span>
+              <span>{{ pembayaran.nomor_referensi }}</span>
+            </div>
+          {% endif %}
+        {% endif %}
+
+        <div class="ringkasan">
+          <span class="ringkasan__label">Status Pesanan</span>
+          <span>
+            {% include "komponen/lencana_status.html" with status=pesanan.status %}
+          </span>
+        </div>
+      </div>
+
+      <p class="teks-redup teks-kecil mb-4">
+        Pembayaran Anda sudah diterima dan pesanan sedang diteruskan ke
+        dapur. Karena pembayaran sudah selesai, tagihan dapat dicetak.
+        Silakan minta cetak tagihan kepada kasir bila diperlukan.
+      </p>
+
+      <div class="d-flex gap-2 justify-content-center flex-wrap">
+        {% if request.pengguna %}
+          <a href="{% url 'core:kasir_tagihan_pdf' pesanan.pk %}"
+             class="btn btn-utama">
+            Unduh Tagihan PDF
+          </a>
+        {% endif %}
+        <a href="{% url 'core:cek_status' %}" class="btn btn-garis">
+          Cek Status Pesanan
+        </a>
+        <a href="{% url 'core:beranda' %}" class="btn btn-garis">
+          Kembali ke Menu
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+{% endblock %}

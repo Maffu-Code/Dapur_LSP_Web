@@ -1,0 +1,105 @@
+{% extends "kerangka_app.html" %}
+
+{% comment %}
+Billing pesanan untuk Kasir (AD05).
+
+Menampilkan rincian item, subtotal, pajak, dan total tagihan. Billing
+dibuat atau diperbarui saat halaman ini dibuka, sehingga nilainya
+selalu sesuai rincian pesanan terbaru dan tidak pernah menjadi ganda.
+{% endcomment %}
+
+{% block judul %}Billing {{ pesanan.nomor_pesanan }}{% endblock %}
+{% block bilah %}Billing Pesanan{% endblock %}
+
+{% block aksi %}
+  <a href="{% url 'core:kasir_detail_pesanan' pesanan.pk %}" class="btn btn-garis">
+    Rincian Pesanan
+  </a>
+  <a href="{% url 'core:kasir_cetak_billing' pesanan.pk %}" class="btn btn-utama">
+    Cetak Billing
+  </a>
+{% endblock %}
+
+{% block isi %}
+
+  <div class="kartu" style="max-width: 780px;">
+    <div class="kartu-kepala">
+      <div>
+        <h2 class="mb-0">Billing {{ pesanan.nomor_pesanan }}</h2>
+        <span class="teks-kecil teks-redup">
+          Meja {{ pesanan.pelanggan.nomor_meja }} atas nama {{ pesanan.pelanggan.nama }}
+        </span>
+      </div>
+      {% include "komponen/lencana_status.html" with status=pesanan.status %}
+    </div>
+
+    <div class="tabel-gulir">
+      <table class="tabel-rapi">
+        <thead>
+          <tr>
+            <th>Produk</th>
+            <th class="angka">Harga</th>
+            <th class="angka">Jumlah</th>
+            <th class="angka">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for detail in pesanan.detail_list.all %}
+            <tr>
+              <td>{{ detail.produk.nama }}</td>
+              <td class="angka">Rp{{ detail.harga_satuan|floatformat:"0" }}</td>
+              <td class="angka">{{ detail.jumlah }}</td>
+              <td class="angka">Rp{{ detail.hitung_subtotal_item|floatformat:"0" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="kartu-isi">
+      <div class="ringkasan">
+        <span class="ringkasan__label">
+          Jumlah Item
+          <span class="teks-redup teks-kecil">
+            ({{ billing.rincian_jumlah }} jenis menu)
+          </span>
+        </span>
+        <span class="uang">{{ billing.hitung_total_item }} porsi</span>
+      </div>
+      <div class="ringkasan">
+        <span class="ringkasan__label">Subtotal</span>
+        <span class="uang">Rp{{ billing.subtotal|floatformat:"0" }}</span>
+      </div>
+      <div class="ringkasan">
+        <span class="ringkasan__label">Pajak / service charge 10 persen</span>
+        <span class="uang">Rp{{ billing.pajak|floatformat:"0" }}</span>
+      </div>
+      <div class="ringkasan ringkasan--total">
+        <span class="ringkasan__label">Total Tagihan</span>
+        <span class="uang-besar">Rp{{ billing.total|floatformat:"0" }}</span>
+      </div>
+
+      {% if billing.dicetak_pada %}
+        <p class="teks-kecil teks-redup mb-0 mt-3">
+          Billing terakhir dicetak pada {{ billing.dicetak_pada|date:"d/m/Y H:i" }} WIB.
+        </p>
+      {% else %}
+        <p class="teks-kecil teks-redup mb-0 mt-3">
+          Billing belum pernah dicetak.
+        </p>
+      {% endif %}
+    </div>
+
+    <div class="kartu-kaki d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <span class="teks-kecil teks-redup">
+        Nilai billing dihitung ulang setiap halaman ini dibuka.
+      </span>
+      {% if pesanan.boleh_dibayar %}
+        <a href="{% url 'core:kasir_pembayaran' pesanan.pk %}" class="btn btn-utama">
+          Lanjut ke Pembayaran
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+{% endblock %}

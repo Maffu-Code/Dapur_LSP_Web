@@ -1,0 +1,104 @@
+{% extends "kerangka_app.html" %}
+
+{% comment %}
+Bukti pembayaran untuk Kasir (AD06).
+
+Ditampilkan setelah pembayaran tersimpan dan dapat ditunjukkan kepada
+pelanggan. Memuat metode pembayaran, jumlah diterima, dan kembalian
+untuk pembayaran tunai.
+{% endcomment %}
+
+{% block judul %}Bukti Pembayaran{% endblock %}
+{% block bilah %}Bukti Pembayaran{% endblock %}
+
+{% block aksi %}
+  <a href="{% url 'core:kasir_pesanan' %}" class="btn btn-garis">
+    Kembali ke Daftar Pesanan
+  </a>
+  <a href="{% url 'core:kasir_pembayaran' pesanan.pk %}" class="btn btn-garis">
+    Lihat Halaman Bayar
+  </a>
+{% endblock %}
+
+{% block isi %}
+
+  <div class="kartu" style="max-width: 620px;">
+    <div class="kartu-isi">
+
+      <div class="text-center mb-4">
+        <span class="lencana lencana-stok--tersedia mb-3">Pembayaran Berhasil</span>
+        <div class="judul" style="font-size: 1.25rem;">Dapur Ina Aina</div>
+        <p class="teks-redup teks-kecil mb-0">Bukti Pembayaran</p>
+      </div>
+
+      <div class="ringkasan">
+        <span class="ringkasan__label">Nomor Pesanan</span>
+        <span class="fw-semibold">{{ pesanan.nomor_pesanan }}</span>
+      </div>
+      <div class="ringkasan">
+        <span class="ringkasan__label">Pemesan</span>
+        <span>{{ pesanan.pelanggan.nama }} (Meja {{ pesanan.pelanggan.nomor_meja }})</span>
+      </div>
+      <div class="ringkasan">
+        <span class="ringkasan__label">Waktu Pembayaran</span>
+        <span>{{ pembayaran.dibayar_pada|date:"d/m/Y H:i" }} WIB</span>
+      </div>
+      <div class="ringkasan">
+        <span class="ringkasan__label">Kasir</span>
+        <span>{{ pembayaran.kasir.nama }}</span>
+      </div>
+      <div class="ringkasan">
+        <span class="ringkasan__label">Metode Pembayaran</span>
+        <span>
+          {% if pembayaran.metode == "TUNAI" %}
+            Tunai
+          {% else %}
+            {{ pembayaran.get_metode_display }}
+            <span class="teks-redup teks-kecil">
+              (No. referensi {{ pembayaran.nomor_referensi }})
+            </span>
+          {% endif %}
+        </span>
+      </div>
+
+      <div class="my-3" style="border-top: 1px solid var(--ina-garis);"></div>
+
+      <div class="ringkasan">
+        <span class="ringkasan__label">Jumlah Item</span>
+        <span class="uang">{{ pembayaran.billing.hitung_total_item }} porsi</span>
+      </div>
+      <div class="ringkasan">
+        <span class="ringkasan__label">Subtotal</span>
+        <span class="uang">Rp{{ pembayaran.billing.subtotal|floatformat:"0" }}</span>
+      </div>
+      <div class="ringkasan">
+        <span class="ringkasan__label">Pajak 10 persen</span>
+        <span class="uang">Rp{{ pembayaran.billing.pajak|floatformat:"0" }}</span>
+      </div>
+      <div class="ringkasan ringkasan--total">
+        <span class="ringkasan__label">Total Tagihan</span>
+        <span class="uang-tebal">Rp{{ pembayaran.billing.total|floatformat:"0" }}</span>
+      </div>
+
+      <div class="ringkasan">
+        <span class="ringkasan__label">Jumlah Diterima</span>
+        <span class="uang">Rp{{ pembayaran.jumlah_diterima|floatformat:"0" }}</span>
+      </div>
+      <div class="ringkasan ringkasan--total">
+        <span class="ringkasan__label">Kembalian</span>
+        <span class="uang-besar">Rp{{ pembayaran.kembalian|floatformat:"0" }}</span>
+      </div>
+
+      <div class="ringkasan">
+        <span class="ringkasan__label">Status Pesanan</span>
+        <span>{% include "komponen/lencana_status.html" with status=pesanan.status %}</span>
+      </div>
+
+      <p class="teks-kecil teks-redup text-center mt-4 mb-0">
+        Terima kasih. Bukti ini dapat ditunjukkan kepada pelanggan.
+      </p>
+
+    </div>
+  </div>
+
+{% endblock %}

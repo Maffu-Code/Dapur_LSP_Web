@@ -1,0 +1,33 @@
+{% comment %}
+Lencana status pesanan.
+
+Status selalu ditampilkan sebagai teks di dalam lencana berwarna, tidak
+pernah hanya berupa warna, agar tetap terbaca oleh pengguna dengan
+gangguan penglihatan warna dan tetap jelas saat dicetak hitam putih.
+
+Warna yang dipakai mengikuti makna tetap:
+  BARU       jingga  (belum dibayar, menunggu pembayaran)
+  DIBAYAR    hijau   (pembayaran diterima)
+  DIPROSES   biru    (sedang dikerjakan dapur)
+  SELESAI    teal    (pesanan tuntas)
+  DIBATALKAN merah   (gagal atau dibatalkan)
+
+Sejak alur bayar di awal, status BARU berarti pesanan belum dibayar.
+Karena itu labelnya ditulis "Menunggu Pembayaran", bukan "Baru", supaya
+pelanggan dan kasir langsung mengetahui langkah berikutnya.
+
+Pemakaian: {% include "komponen/lencana_status.html" with status=pesanan.status %}
+{% endcomment %}
+{% if status == "BARU" %}
+  <span class="lencana-status lencana-status--baru">Menunggu Pembayaran</span>
+{% elif status == "DIBAYAR" %}
+  <span class="lencana-status lencana-status--dibayar">Dibayar</span>
+{% elif status == "DIPROSES" %}
+  <span class="lencana-status lencana-status--diproses">Diproses</span>
+{% elif status == "SELESAI" %}
+  <span class="lencana-status lencana-status--selesai">Selesai</span>
+{% elif status == "DIBATALKAN" %}
+  <span class="lencana-status lencana-status--dibatalkan">Dibatalkan</span>
+{% else %}
+  <span class="lencana-status">{{ status }}</span>
+{% endif %}

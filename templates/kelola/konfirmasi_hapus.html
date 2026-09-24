@@ -1,0 +1,76 @@
+{% extends "kerangka_app.html" %}
+
+{% comment %}
+Konfirmasi hapus data (AD09, AD10, AD11).
+
+Satu template dipakai untuk produk, kategori, dan pengguna karena
+bentuknya sama. Perbedaannya hanya pada pesan dan alasan penolakan.
+
+Bila data tidak boleh dihapus, tombol hapus tidak ditampilkan dan
+halaman menampilkan alasan penolakan beserta saran tindakan lain.
+Ini mencegah kasus data terhapus yang membuat riwayat pesanan atau
+laporan menjadi rusak.
+{% endcomment %}
+
+{% block judul %}Hapus {{ jenis|title }}{% endblock %}
+{% block bilah %}Hapus {{ jenis|title }}{% endblock %}
+
+{% block isi %}
+
+  <div class="kartu" style="max-width: 620px;">
+    <div class="kartu-kepala">
+      <h2>Konfirmasi Hapus</h2>
+    </div>
+
+    <div class="kartu-isi">
+
+      {% if boleh_hapus %}
+        <p class="mb-3">
+          Anda akan menghapus data berikut secara permanen:
+        </p>
+
+        <div class="kartu kartu-isi mb-3">
+          <div class="ringkasan">
+            <span class="ringkasan__label">Jenis Data</span>
+            <span class="fw-semibold">{{ jenis|title }}</span>
+          </div>
+          <div class="ringkasan">
+            <span class="ringkasan__label">Nama</span>
+            <span class="fw-semibold">{{ objek }}</span>
+          </div>
+        </div>
+
+        <div class="pesan-sistem pesan-sistem--ingat">
+          Data yang sudah dihapus tidak dapat dikembalikan.
+        </div>
+      {% else %}
+        <div class="pesan-sistem pesan-sistem--gagal">
+          {{ alasan_tolak }}
+        </div>
+
+        <p class="teks-redup mb-0">
+          Data ini tidak dapat dihapus karena masih terhubung dengan data
+          lain pada sistem.
+        </p>
+      {% endif %}
+
+    </div>
+
+    <div class="kartu-kaki d-flex justify-content-end gap-2">
+      <a href="{% url url_batal %}" class="btn btn-garis">
+        {% if boleh_hapus %}Batal{% else %}Kembali{% endif %}
+      </a>
+
+      {% if boleh_hapus %}
+        <form method="post" data-cegah-ganda>
+          {% csrf_token %}
+          <button type="submit" class="btn btn-bahaya-padat"
+                  data-konfirmasi="Hapus data ini secara permanen?">
+            Hapus {{ jenis|title }}
+          </button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "kerangka_app.html" %}
+
+{% comment %}
+Tampilan cetak billing (AD05).
+
+Aplikasi dijalankan lokal tanpa printer, sehingga pencetakan diwakili
+oleh halaman ringkas ini. Waktu cetak dicatat pada data billing, dan
+halaman ini dapat dicetak lewat peramban bila diperlukan.
+{% endcomment %}
+
+{% block judul %}Cetak Billing {{ pesanan.nomor_pesanan }}{% endblock %}
+{% block bilah %}Cetak Billing{% endblock %}
+
+{% block aksi %}
+  <a href="{% url 'core:kasir_billing' pesanan.pk %}" class="btn btn-garis">
+    Kembali ke Billing
+  </a>
+  <button type="button" class="btn btn-utama" onclick="window.print();">
+    Cetak Sekarang
+  </button>
+{% endblock %}
+
+{% block isi %}
+
+  <div class="kartu" style="max-width: 560px;">
+    <div class="kartu-isi">
+
+      <div class="text-center mb-4">
+        <div class="judul" style="font-size: 1.25rem;">Dapur Ina Aina</div>
+        <p class="teks-redup teks-kecil mb-0">
+          Sistem Informasi Restoran
+        </p>
+      </div>
+
+      <div class="ringkasan">
+        <span class="ringkasan__label">Nomor Pesanan</span>
+        <span class="fw-semibold">{{ pesanan.nomor_pesanan }}</span>
+      </div>
+      <div class="ringkasan">
+        <span class="ringkasan__label">Pemesan</span>
+        <span>{{ pesanan.pelanggan.nama }}</span>
+      </div>
+      <div class="ringkasan">
+        <span class="ringkasan__label">Meja</span>
+        <span>{{ pesanan.pelanggan.nomor_meja }}</span>
+      </div>
+      <div class="ringkasan">
+        <span class="ringkasan__label">Waktu Pesan</span>
+        <span>{{ pesanan.dibuat_pada|date:"d/m/Y H:i" }}</span>
+      </div>
+
+      <div class="my-3" style="border-top: 1px solid var(--ina-garis);"></div>
+
+      {% for detail in pesanan.detail_list.all %}
+        <div class="ringkasan">
+          <span>
+            {{ detail.produk.nama }}
+            <span class="teks-redup teks-kecil">
+              {{ detail.jumlah }} x Rp{{ detail.harga_satuan|floatformat:"0" }}
+            </span>
+          </span>
+          <span class="uang">Rp{{ detail.hitung_subtotal_item|floatformat:"0" }}</span>
+        </div>
+      {% endfor %}
+
+      <div class="my-3" style="border-top: 1px solid var(--ina-garis);"></div>
+
+      <div class="ringkasan">
+        <span class="ringkasan__label">Jumlah Item</span>
+        <span class="uang">{{ billing.hitung_total_item }} porsi</span>
+      </div>
+      <div class="ringkasan">
+        <span class="ringkasan__label">Subtotal</span>
+        <span class="uang">Rp{{ billing.subtotal|floatformat:"0" }}</span>
+      </div>
+      <div class="ringkasan">
+        <span class="ringkasan__label">Pajak 10 persen</span>
+        <span class="uang">Rp{{ billing.pajak|floatformat:"0" }}</span>
+      </div>
+      <div class="ringkasan ringkasan--total">
+        <span class="ringkasan__label">Total</span>
+        <span class="uang-tebal">Rp{{ billing.total|floatformat:"0" }}</span>
+      </div>
+
+      <p class="teks-kecil teks-redup text-center mt-4 mb-0">
+        Billing dicetak pada
+        {{ billing.dicetak_pada|date:"d/m/Y H:i" }} WIB.
+        Terima kasih telah berkunjung.
+      </p>
+
+    </div>
+  </div>
+
+{% endblock %}

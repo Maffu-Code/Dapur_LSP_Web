@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% comment %}
+Halaman konfirmasi setelah pesanan berhasil dikirim (AD02).
+
+Menampilkan nomor pesanan secara menonjol, karena nomor inilah yang
+dipakai pelanggan untuk memeriksa status pesanannya.
+{% endcomment %}
+
+{% block judul %}Pesanan Diterima{% endblock %}
+
+{% block isi %}
+
+  <div class="kartu mb-4" style="max-width: 620px; margin: 0 auto;">
+    <div class="kartu-isi text-center">
+      <span class="lencana lencana-stok--tersedia mb-3">Pesanan Berhasil Dikirim</span>
+
+      <p class="teks-redup mb-2">Nomor pesanan Anda</p>
+      <p class="judul mb-4" style="font-size: 1.75rem; letter-spacing: 0.02em;">
+        {{ pesanan.nomor_pesanan }}
+      </p>
+
+      <div class="kartu kartu-isi text-start mb-4">
+        <div class="ringkasan">
+          <span class="ringkasan__label">Nama Pemesan</span>
+          <span class="fw-semibold">{{ pesanan.pelanggan.nama }}</span>
+        </div>
+        <div class="ringkasan">
+          <span class="ringkasan__label">Nomor Meja</span>
+          <span class="fw-semibold">{{ pesanan.pelanggan.nomor_meja }}</span>
+        </div>
+        <div class="ringkasan">
+          <span class="ringkasan__label">Waktu Pesan</span>
+          <span>{{ pesanan.dibuat_pada|date:"d F Y, H:i" }} WIB</span>
+        </div>
+        <div class="ringkasan">
+          <span class="ringkasan__label">Status</span>
+          <span>{% include "komponen/lencana_status.html" with status=pesanan.status %}</span>
+        </div>
+      </div>
+
+      <p class="teks-redup teks-kecil mb-4">
+        Simpan nomor pesanan di atas untuk memeriksa status pesanan Anda.
+        Pesanan akan diteruskan ke dapur setelah pembayaran selesai.
+      </p>
+
+      <div class="d-flex gap-2 justify-content-center flex-wrap">
+        <a href="{% url 'core:cek_status' %}" class="btn btn-utama">
+          Cek Status Pesanan
+        </a>
+        <a href="{% url 'core:beranda' %}" class="btn btn-garis">
+          Kembali ke Menu
+        </a>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

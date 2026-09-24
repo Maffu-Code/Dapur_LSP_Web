@@ -1,0 +1,89 @@
+{% extends "kerangka_app.html" %}
+
+{% comment %}
+Daftar pengguna aplikasi untuk Administrator (AD11).
+
+Menampilkan seluruh pengguna beserta peran dan keadaannya. Akun yang
+sedang dipakai login ditandai supaya Administrator tahu akun mana yang
+tidak dapat dihapus.
+{% endcomment %}
+
+{% block judul %}Kelola Pengguna{% endblock %}
+{% block bilah %}Kelola Pengguna{% endblock %}
+
+{% block aksi %}
+  <a href="{% url 'core:kelola_pengguna_tambah' %}" class="btn btn-utama">
+    Tambah Pengguna
+  </a>
+{% endblock %}
+
+{% block isi %}
+
+  <div class="kartu">
+    <div class="kartu-kepala">
+      <h2>Daftar Pengguna</h2>
+      <span class="teks-kecil teks-redup">
+        Password disimpan dalam bentuk hash, tidak pernah berupa teks asli
+      </span>
+    </div>
+
+    {% if pengguna_list %}
+      <div class="tabel-gulir">
+        <table class="tabel-rapi">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Nama Lengkap</th>
+              <th>Peran</th>
+              <th>Keadaan</th>
+              <th class="text-end">Tindakan</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pengguna in pengguna_list %}
+              <tr>
+                <td class="fw-semibold">
+                  {{ pengguna.username }}
+                  {% if pengguna.pk == pengguna_saat_ini.pk %}
+                    <span class="lencana ms-1">Akun Anda</span>
+                  {% endif %}
+                </td>
+                <td>{{ pengguna.nama }}</td>
+                <td>
+                  <span class="lencana">{{ pengguna.get_role_display }}</span>
+                </td>
+                <td>
+                  {% if pengguna.aktif %}
+                    <span class="lencana lencana-stok--tersedia">Aktif</span>
+                  {% else %}
+                    <span class="lencana lencana-stok--habis">Tidak Aktif</span>
+                  {% endif %}
+                </td>
+                <td class="text-end">
+                  <div class="d-flex gap-1 justify-content-end flex-wrap">
+                    <a href="{% url 'core:kelola_pengguna_ubah' pengguna.pk %}"
+                       class="btn btn-garis btn-sm">Ubah</a>
+                    <a href="{% url 'core:kelola_pengguna_hapus' pengguna.pk %}"
+                       class="btn btn-bahaya btn-sm">Hapus</a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="keadaan-kosong">
+        <p class="keadaan-kosong__judul">Belum ada pengguna</p>
+        <p class="mb-0">Tambahkan pengguna untuk kasir atau administrator.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <p class="teks-kecil teks-redup mt-3 mb-0">
+    Akun yang sedang Anda pakai tidak dapat dihapus, begitu juga akun
+    yang pernah menangani pembayaran. Akun semacam itu cukup
+    dinonaktifkan dengan menghilangkan tanda Akun Aktif.
+  </p>
+
+{% endblock %}

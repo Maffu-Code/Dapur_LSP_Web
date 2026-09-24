@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% comment %}
+Halaman masuk untuk Kasir dan Administrator (AD01).
+
+Pelanggan tidak memakai halaman ini karena tidak memiliki akun.
+Halaman ini sengaja tidak memakai sidebar agar berbeda jelas dari
+halaman kerja staf.
+{% endcomment %}
+
+{% block judul %}Masuk{% endblock %}
+
+{% block susunan %}
+<div class="wadah-pelanggan" style="max-width: 420px; padding-top: 4rem;">
+
+  <div class="text-center mb-4">
+    <div class="judul" style="font-size: 1.375rem;">Dapur Ina Aina</div>
+    <p class="teks-redup mb-0">Sistem Informasi Restoran</p>
+  </div>
+
+  {% include "komponen/pesan_sistem.html" %}
+
+  <div class="kartu">
+    <div class="kartu-kepala">
+      <h2>Masuk Staf</h2>
+    </div>
+    <div class="kartu-isi">
+      <form method="post" novalidate data-cegah-ganda>
+        {% csrf_token %}
+
+        <div class="mb-3">
+          <label for="{{ form.username.id_for_label }}" class="form-label">
+            {{ form.username.label }}
+          </label>
+          {{ form.username }}
+          {% for galat in form.username.errors %}
+            <div class="pesan-galat">{{ galat }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-4">
+          <label for="{{ form.password.id_for_label }}" class="form-label">
+            {{ form.password.label }}
+          </label>
+          {{ form.password }}
+          {% for galat in form.password.errors %}
+            <div class="pesan-galat">{{ galat }}</div>
+          {% endfor %}
+        </div>
+
+        {% for galat in form.non_field_errors %}
+          <div class="pesan-sistem pesan-sistem--gagal">{{ galat }}</div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-utama w-100">Masuk</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="text-center mt-3">
+    <a href="{% url 'core:beranda' %}" class="teks-kecil">Kembali ke halaman menu</a>
+  </div>
+
+</div>
+{% endblock %}

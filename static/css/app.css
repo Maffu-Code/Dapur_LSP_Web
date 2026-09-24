@@ -1,0 +1,854 @@
+/* ==========================================================================
+   Gaya tampilan aplikasi Dapur Ina Aina
+   ==========================================================================
+   Berkas ini adalah satu sumber kebenaran untuk warna, jarak, dan bentuk
+   komponen. Bootstrap 5 dipakai hanya untuk tata letak (grid, flex, utilitas
+   jarak); tampilan visual diatur di sini agar hasilnya konsisten dan tidak
+   bergantung pada gaya bawaan Bootstrap.
+
+   Aturan yang dipakai:
+   - Satu warna aksen (biru) untuk seluruh tombol dan tautan utama.
+   - Warna status pesanan memakai makna tetap: abu (baru), oranye (diproses),
+     teal (selesai), hijau (dibayar), merah (dibatalkan).
+   - Status selalu ditampilkan sebagai lencana berisi teks, tidak pernah
+     hanya berupa warna, agar tetap terbaca oleh pengguna dengan gangguan
+     penglihatan warna.
+   - Semua angka uang memakai font-variant-numeric: tabular-nums supaya
+     digit sejajar rapi saat dibaca berulang.
+   ========================================================================== */
+
+:root {
+  /* Warna aksen */
+  --ina-aksen: #35618f;
+  --ina-aksen-hover: #2b5182;
+  --ina-aksen-lembut: #eaf2fa;
+
+  /* Warna netral */
+  --ina-halaman: #f8fafc;
+  --ina-permukaan: #ffffff;
+  --ina-garis: #e2e8f0;
+  --ina-garis-tegas: #cbd5e1;
+  --ina-teks: #334155;
+  --ina-teks-redup: #5b6b7f;
+  --ina-judul: #1e293b;
+
+  /* Sidebar (khusus halaman Kasir dan Administrator) */
+  --ina-sidebar: #1e293b;
+  --ina-sidebar-teks: #cbd5e1;
+  --ina-sidebar-aktif: #334155;
+  --ina-sidebar-garis: #334155;
+
+  /* Warna makna status pesanan */
+  --ina-baru-teks: #57534e;
+  --ina-baru-latar: #f5f5f4;
+  --ina-proses-teks: #9a4a00;
+  --ina-proses-latar: #fdf0d5;
+  --ina-selesai-teks: #0b6e75;
+  --ina-selesai-latar: #d9f2f4;
+  --ina-bayar-teks: #15803d;
+  --ina-bayar-latar: #dcfce7;
+  --ina-batal-teks: #b91c1c;
+  --ina-batal-latar: #fee2e2;
+
+  /* Warna makna untuk pesan sistem */
+  --ina-sukses-teks: #15803d;
+  --ina-sukses-latar: #dcfce7;
+  --ina-gagal-teks: #b91c1c;
+  --ina-gagal-latar: #fee2e2;
+  --ina-ingat-teks: #9a4a00;
+  --ina-ingat-latar: #fdf0d5;
+
+  /* Bentuk dan bayangan */
+  --ina-radius: 6px;
+  --ina-radius-kecil: 4px;
+  --ina-bayang: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --ina-bayang-tinggi: 0 4px 12px rgba(15, 23, 42, 0.10);
+
+  /* Ukuran tata letak */
+  --ina-sidebar-lebar: 232px;
+  --ina-tinggi-kontrol: 40px;
+}
+
+/* --------------------------------------------------------------------------
+   Dasar halaman
+   -------------------------------------------------------------------------- */
+
+body {
+  background-color: var(--ina-halaman);
+  color: var(--ina-teks);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  /* Font sistem: tidak perlu mengunduh berkas font, tampil konsisten
+     di komputer lab, dan langsung terbaca. */
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.judul {
+  color: var(--ina-judul);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+}
+
+h3 {
+  font-size: 1.0625rem;
+}
+
+a {
+  color: var(--ina-aksen);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--ina-aksen-hover);
+  text-decoration: underline;
+}
+
+/* Tautan yang tampil sebagai teks biasa di dalam tabel */
+.tautan-selalu {
+  text-decoration: none;
+}
+
+.teks-redup {
+  color: var(--ina-teks-redup);
+}
+
+.teks-kecil {
+  font-size: 0.8125rem;
+}
+
+/* --------------------------------------------------------------------------
+   Angka uang
+   -------------------------------------------------------------------------- */
+
+.uang {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.uang-tebal {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.uang-besar {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 1.75rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Kolom tabel berisi angka rata kanan supaya digit sejajar */
+.tabel-rapi th.angka,
+.tabel-rapi td.angka {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Tombol
+   -------------------------------------------------------------------------- */
+
+.btn {
+  border-radius: var(--ina-radius-kecil);
+  font-weight: 500;
+  padding: 0.4375rem 0.9375rem;
+  /* Area sentuh minimal 44px agar nyaman dipakai di layar sentuh. */
+  min-height: 38px;
+}
+
+.btn-utama {
+  background-color: var(--ina-aksen);
+  border: 1px solid var(--ina-aksen);
+  color: #ffffff;
+}
+
+.btn-utama:hover,
+.btn-utama:focus {
+  background-color: var(--ina-aksen-hover);
+  border-color: var(--ina-aksen-hover);
+  color: #ffffff;
+}
+
+.btn-utama:disabled,
+.btn-utama.disabled {
+  background-color: #93a9c4;
+  border-color: #93a9c4;
+  color: #ffffff;
+}
+
+.btn-garis {
+  background-color: var(--ina-permukaan);
+  border: 1px solid var(--ina-garis-tegas);
+  color: var(--ina-teks);
+}
+
+.btn-garis:hover,
+.btn-garis:focus {
+  background-color: #f1f5f9;
+  border-color: var(--ina-aksen);
+  color: var(--ina-aksen-hover);
+}
+
+.btn-bahaya {
+  background-color: var(--ina-permukaan);
+  border: 1px solid var(--ina-batal-teks);
+  color: var(--ina-batal-teks);
+}
+
+.btn-bahaya:hover,
+.btn-bahaya:focus {
+  background-color: var(--ina-batal-latar);
+  border-color: var(--ina-batal-teks);
+  color: var(--ina-batal-teks);
+}
+
+.btn-bahaya-padat {
+  background-color: var(--ina-batal-teks);
+  border: 1px solid var(--ina-batal-teks);
+  color: #ffffff;
+}
+
+.btn-bahaya-padat:hover,
+.btn-bahaya-padat:focus {
+  background-color: #991b1b;
+  border-color: #991b1b;
+  color: #ffffff;
+}
+
+/* Tanda fokus yang jelas untuk pengguna yang menavigasi dengan keyboard */
+.btn:focus-visible,
+.form-control:focus,
+.form-select:focus,
+a:focus-visible {
+  outline: 2px solid var(--ina-aksen);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   Formulir
+   -------------------------------------------------------------------------- */
+
+.form-label {
+  font-weight: 500;
+  color: var(--ina-judul);
+  margin-bottom: 0.25rem;
+}
+
+.form-control,
+.form-select {
+  border-color: var(--ina-garis-tegas);
+  border-radius: var(--ina-radius-kecil);
+  min-height: var(--ina-tinggi-kontrol);
+  color: var(--ina-teks);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--ina-aksen);
+}
+
+.form-text {
+  color: var(--ina-teks-redup);
+  font-size: 0.8125rem;
+}
+
+/* Pesan kesalahan pada formulir */
+.pesan-galat {
+  color: var(--ina-gagal-teks);
+  font-size: 0.8125rem;
+  margin-top: 0.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   Kartu / permukaan
+   -------------------------------------------------------------------------- */
+
+.kartu {
+  background-color: var(--ina-permukaan);
+  border: 1px solid var(--ina-garis);
+  border-radius: var(--ina-radius);
+  box-shadow: var(--ina-bayang);
+}
+
+.kartu-kepala {
+  padding: 0.875rem 1.125rem;
+  border-bottom: 1px solid var(--ina-garis);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.kartu-kepala h2,
+.kartu-kepala h3 {
+  margin: 0;
+}
+
+.kartu-isi {
+  padding: 1.125rem;
+}
+
+.kartu-kaki {
+  padding: 0.875rem 1.125rem;
+  border-top: 1px solid var(--ina-garis);
+  background-color: #fbfdff;
+}
+
+/* --------------------------------------------------------------------------
+   Lencana status pesanan
+   -------------------------------------------------------------------------- */
+
+.lencana-status {
+  display: inline-block;
+  padding: 0.1875rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.lencana-status--baru {
+  color: var(--ina-baru-teks);
+  background-color: var(--ina-baru-latar);
+  border-color: #e7e5e4;
+}
+
+.lencana-status--diproses {
+  color: var(--ina-proses-teks);
+  background-color: var(--ina-proses-latar);
+  border-color: #f5dfae;
+}
+
+.lencana-status--selesai {
+  color: var(--ina-selesai-teks);
+  background-color: var(--ina-selesai-latar);
+  border-color: #b6e4e7;
+}
+
+.lencana-status--dibayar {
+  color: var(--ina-bayar-teks);
+  background-color: var(--ina-bayar-latar);
+  border-color: #a9e5bd;
+}
+
+.lencana-status--dibatalkan {
+  color: var(--ina-batal-teks);
+  background-color: var(--ina-batal-latar);
+  border-color: #f6c4c4;
+}
+
+/* Lencana netral untuk keterangan lain (kategori, metode pembayaran) */
+.lencana {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--ina-radius-kecil);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ina-teks-redup);
+  background-color: #f1f5f9;
+  border: 1px solid var(--ina-garis);
+}
+
+/* Lencana ketersediaan stok */
+.lencana-stok--tersedia {
+  color: var(--ina-bayar-teks);
+  background-color: var(--ina-bayar-latar);
+  border-color: #a9e5bd;
+}
+
+.lencana-stok--habis {
+  color: var(--ina-batal-teks);
+  background-color: var(--ina-batal-latar);
+  border-color: #f6c4c4;
+}
+
+/* --------------------------------------------------------------------------
+   Tabel data
+   -------------------------------------------------------------------------- */
+
+.tabel-rapi {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+}
+
+.tabel-rapi thead th {
+  background-color: #f8fafc;
+  border-bottom: 1px solid var(--ina-garis);
+  color: var(--ina-teks-redup);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.625rem 0.875rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tabel-rapi tbody td {
+  border-bottom: 1px solid var(--ina-garis);
+  padding: 0.6875rem 0.875rem;
+  vertical-align: middle;
+}
+
+.tabel-rapi tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.tabel-rapi tbody tr:hover {
+  background-color: #fbfdff;
+}
+
+/* Wadah tabel yang bisa digulir mendatar di layar sempit */
+.tabel-gulir {
+  overflow-x: auto;
+}
+
+/* --------------------------------------------------------------------------
+   Kerangka halaman aplikasi (sidebar + area isi)
+   -------------------------------------------------------------------------- */
+
+.kerangka {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: var(--ina-sidebar-lebar);
+  flex-shrink: 0;
+  background-color: var(--ina-sidebar);
+  color: var(--ina-sidebar-teks);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar__merek {
+  padding: 1.125rem 1.25rem;
+  border-bottom: 1px solid var(--ina-sidebar-garis);
+}
+
+.sidebar__nama {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.sidebar__peran {
+  font-size: 0.75rem;
+  color: var(--ina-sidebar-teks);
+  margin: 0.125rem 0 0;
+}
+
+.sidebar__nav {
+  padding: 0.75rem 0.625rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  flex-grow: 1;
+}
+
+.sidebar__judul-grup {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  padding: 0.875rem 0.625rem 0.375rem;
+}
+
+.sidebar__tautan {
+  display: block;
+  padding: 0.5rem 0.625rem;
+  border-radius: var(--ina-radius-kecil);
+  color: var(--ina-sidebar-teks);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.sidebar__tautan:hover {
+  background-color: var(--ina-sidebar-aktif);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.sidebar__tautan--aktif {
+  background-color: var(--ina-aksen);
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.sidebar__tautan--aktif:hover {
+  background-color: var(--ina-aksen-hover);
+}
+
+.sidebar__kaki {
+  padding: 0.875rem 1.25rem;
+  border-top: 1px solid var(--ina-sidebar-garis);
+  font-size: 0.8125rem;
+}
+
+.isi-utama {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.bilah-atas {
+  background-color: var(--ina-permukaan);
+  border-bottom: 1px solid var(--ina-garis);
+  padding: 0.875rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.bilah-atas h1 {
+  margin: 0;
+  font-size: 1.1875rem;
+}
+
+.isi-halaman {
+  padding: 1.5rem;
+  flex-grow: 1;
+}
+
+/* Pada layar sempit, sidebar berubah menjadi baris tautan mendatar
+   agar tetap bisa dipakai pada tablet dan ponsel. */
+@media (max-width: 767.98px) {
+  .kerangka {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  .sidebar__nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 0.5rem;
+  }
+
+  .sidebar__judul-grup {
+    display: none;
+  }
+
+  .sidebar__tautan {
+    white-space: nowrap;
+  }
+
+  .isi-halaman {
+    padding: 1rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Halaman Pelanggan (tanpa sidebar)
+   -------------------------------------------------------------------------- */
+
+.bilah-pelanggan {
+  background-color: var(--ina-permukaan);
+  border-bottom: 1px solid var(--ina-garis);
+}
+
+.bilah-pelanggan__isi {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0.875rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.bilah-pelanggan__merek {
+  font-weight: 600;
+  font-size: 1.0625rem;
+  color: var(--ina-judul);
+  letter-spacing: -0.01em;
+}
+
+.wadah-pelanggan {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+/* --------------------------------------------------------------------------
+   Pesan sistem (sukses / gagal / peringatan)
+   -------------------------------------------------------------------------- */
+
+.pesan-sistem {
+  border: 1px solid transparent;
+  border-radius: var(--ina-radius-kecil);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.pesan-sistem--sukses {
+  color: var(--ina-sukses-teks);
+  background-color: var(--ina-sukses-latar);
+  border-color: #a9e5bd;
+}
+
+.pesan-sistem--gagal {
+  color: var(--ina-gagal-teks);
+  background-color: var(--ina-gagal-latar);
+  border-color: #f6c4c4;
+}
+
+.pesan-sistem--ingat {
+  color: var(--ina-ingat-teks);
+  background-color: var(--ina-ingat-latar);
+  border-color: #f5dfae;
+}
+
+/* --------------------------------------------------------------------------
+   Keadaan kosong (belum ada data)
+   -------------------------------------------------------------------------- */
+
+.keadaan-kosong {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--ina-teks-redup);
+}
+
+.keadaan-kosong__judul {
+  color: var(--ina-judul);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   Kartu menu produk (halaman Pelanggan)
+   -------------------------------------------------------------------------- */
+
+.grid-menu {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 576px) {
+  .grid-menu {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 992px) {
+  .grid-menu {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.kartu-produk {
+  background-color: var(--ina-permukaan);
+  border: 1px solid var(--ina-garis);
+  border-radius: var(--ina-radius);
+  box-shadow: var(--ina-bayang);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+}
+
+.kartu-produk--habis {
+  background-color: #fcfcfc;
+}
+
+.kartu-produk__nama {
+  font-weight: 600;
+  color: var(--ina-judul);
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.kartu-produk__deskripsi {
+  color: var(--ina-teks-redup);
+  font-size: 0.8125rem;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.kartu-produk__harga {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--ina-judul);
+}
+
+/* --------------------------------------------------------------------------
+   Kotak ringkasan angka (billing, laporan, bukti pembayaran)
+   -------------------------------------------------------------------------- */
+
+.ringkasan {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed var(--ina-garis);
+}
+
+.ringkasan:last-child {
+  border-bottom: 0;
+}
+
+.ringkasan__label {
+  color: var(--ina-teks-redup);
+}
+
+.ringkasan--total {
+  border-top: 1px solid var(--ina-garis);
+  border-bottom: 0;
+  margin-top: 0.25rem;
+  padding-top: 0.75rem;
+}
+
+.ringkasan--total .ringkasan__label {
+  font-weight: 600;
+  color: var(--ina-judul);
+}
+
+/* ==========================================================================
+   Permukaan peramban
+   ==========================================================================
+   Bagian berikut mengatur tampilan bawaan peramban yang tidak termasuk
+   sistem desain mana pun: warna sorotan teks, warna kursor, dan batang
+   gulir. Mengaturnya dari palet membuat halaman terasa satu kesatuan,
+   bukan gabungan komponen.
+   ========================================================================== */
+
+::selection {
+  background-color: #cfe0f2;
+  color: var(--ina-judul);
+}
+
+/* Warna kursor pada kolom isian mengikuti warna aksen. */
+.form-control,
+.form-select,
+textarea {
+  caret-color: var(--ina-aksen);
+}
+
+/* Garis bawah tautan diberi jarak agar tidak menempel pada huruf. */
+a {
+  text-underline-offset: 2px;
+}
+
+/* Batang gulir disesuaikan pada peramban berbasis WebKit dan Firefox. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #b6c2d1 var(--ina-halaman);
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--ina-halaman);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #b6c2d1;
+  border: 3px solid var(--ina-halaman);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+/* ==========================================================================
+   Tampilan cetak
+   ==========================================================================
+   Dipakai pada halaman cetak billing (AD05). Saat dicetak, sidebar,
+   bilah atas, tombol, dan pesan sistem tidak ikut tercetak sehingga
+   yang keluar hanya isi tagihan.
+   ========================================================================== */
+
+@media print {
+  body {
+    background-color: #ffffff;
+  }
+
+  .sidebar,
+  .bilah-atas,
+  .bilah-pelanggan,
+  .pesan-sistem,
+  .btn,
+  .sidebar__kaki,
+  .sidebar__nav,
+  [data-blok-tunai],
+  [data-blok-kartu] {
+    display: none !important;
+  }
+
+  .kerangka,
+  .isi-utama {
+    display: block;
+    min-height: 0;
+  }
+
+  .isi-halaman {
+    padding: 0;
+  }
+
+  /* Kartu dibuat rata tanpa bayangan agar hemat tinta dan tetap jelas. */
+  .kartu {
+    border: 0;
+    box-shadow: none;
+    max-width: 100% !important;
+  }
+
+  .kartu-kepala,
+  .kartu-kaki {
+    border-color: #999999;
+  }
+
+  .tabel-rapi thead th {
+    background-color: #f0f0f0;
+  }
+
+  /* Pastikan warna lencana status tetap tercetak. */
+  .lencana-status,
+  .lencana {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+

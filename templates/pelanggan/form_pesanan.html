@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% comment %}
+Halaman pengisian pesanan untuk Pelanggan (AD02).
+
+Berisi nama pemesan, nomor meja, dan kolom jumlah untuk setiap produk.
+Kolom jumlah dikosongkan berarti produk tidak dipesan.
+
+Bila ada kesalahan, baik dari formulir maupun dari aturan stok,
+kesalahan ditampilkan dan isian sebelumnya tetap terpelihara.
+{% endcomment %}
+
+{% block judul %}Pesan Menu{% endblock %}
+
+{% block isi %}
+
+  <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-3">
+    <div>
+      <h1 class="mb-1">Pesan Menu</h1>
+      <p class="teks-redup mb-0">
+        Isi jumlah pada menu yang ingin dipesan, lalu lengkapi nama dan nomor meja.
+      </p>
+    </div>
+    <a href="{% url 'core:beranda' %}" class="btn btn-garis">Lihat Menu</a>
+  </div>
+
+  {% if form.non_field_errors %}
+    {% for galat in form.non_field_errors %}
+      <div class="pesan-sistem pesan-sistem--gagal" role="alert">{{ galat }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" novalidate data-cegah-ganda>
+    {% csrf_token %}
+
+    <div class="kartu mb-4">
+      <div class="kartu-kepala">
+        <h2>Data Pemesan</h2>
+      </div>
+      <div class="kartu-isi">
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label for="{{ form.nama.id_for_label }}" class="form-label">
+              {{ form.nama.label }}
+            </label>
+            {{ form.nama }}
+            {% for galat in form.nama.errors %}
+              <div class="pesan-galat">{{ galat }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-12 col-md-6">
+            <label for="{{ form.nomor_meja.id_for_label }}" class="form-label">
+              {{ form.nomor_meja.label }}
+            </label>
+            {{ form.nomor_meja }}
+            {% for galat in form.nomor_meja.errors %}
+              <div class="pesan-galat">{{ galat }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        {% comment %}
+          Metode pembayaran dipilih sejak awal karena pesanan wajib
+          dibayar sebelum diproses. Pilihan ini menentukan halaman
+          pembayaran yang dibuka setelah pesanan dikirim.
+        {% endcomment %}
+        <div class="mt-3">
+          <span class="form-label d-block">{{ form.metode_pembayaran.label }}</span>
+          {% for radio in form.metode_pembayaran %}
+            <div class="form-check mb-2">
+              {{ radio.tag }}
+              <label class="form-check-label" for="{{ radio.id_for_label }}">
+                {{ radio.choice_label }}
+              </label>
+            </div>
+          {% endfor %}
+          <div class="form-text">{{ form.metode_pembayaran.help_text }}</div>
+          {% for galat in form.metode_pembayaran.errors %}
+            <div class="pesan-galat">{{ galat }}</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="kartu mb-4">
+      <div class="kartu-kepala">
+        <h2>Daftar Menu</h2>
+        <span class="teks-kecil teks-redup">
+          Kosongkan jumlah bila tidak dipesan
+        </span>
+      </div>
+
+      {% if produk_list %}
+        <div class="tabel-gulir">
+          <table class="tabel-rapi">
+            <thead>
+              <tr>
+                <th>Produk</th>
+                <th>Kategori</th>
+                <th class="angka">Harga</th>
+                <th class="angka">Stok</th>
+                <th class="angka" style="width: 8rem;">Jumlah</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for produk, field_jumlah in form.baris %}
+                <tr>
+                  <td>
+                    <span class="fw-semibold">{{ produk.nama }}</span>
+                    {% if not produk.aktif %}
+                      <span class="lencana ms-1">Tidak dijual</span>
+                    {% endif %}
+                  </td>
+                  <td><span class="lencana">{{ produk.kategori.nama }}</span></td>
+                  <td class="angka">Rp{{ produk.harga|floatformat:"0" }}</td>
+                  <td class="angka">
+                    {% if produk.stok > 0 %}
+                      {{ produk.stok }}
+                    {% else %}
+                      <span class="lencana lencana-stok--habis">Habis</span>
+                    {% endif %}
+                  </td>
+                  <td class="angka">
+                    <label class="visually-hidden" for="{{ field_jumlah.id_for_label }}">
+                      Jumlah untuk {{ produk.nama }}
+                    </label>
+                    {{ field_jumlah }}
+                    {% for galat in field_jumlah.errors %}
+                      <div class="pesan-galat">{{ galat }}</div>
+                    {% endfor %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="keadaan-kosong">
+          <p class="keadaan-kosong__judul">Belum ada produk</p>
+          <p class="mb-0">Menu belum tersedia sehingga pesanan belum dapat dibuat.</p>
+        </div>
+      {% endif %}
+
+      <div class="kartu-kaki d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span class="teks-kecil teks-redup">
+          Harga belum termasuk pajak 10 persen. Total dihitung pada saat billing.
+        </span>
+        <button type="submit" class="btn btn-utama">Kirim Pesanan</button>
+      </div>
+    </div>
+
+  </form>
+
+{% endblock %}

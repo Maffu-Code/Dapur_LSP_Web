@@ -1,0 +1,79 @@
+{% extends "kerangka_app.html" %}
+
+{% comment %}
+Formulir tambah dan ubah kategori produk (AD10).
+
+Formulir yang sama dipakai untuk dua keperluan, dibedakan oleh variabel
+"aksi".
+{% endcomment %}
+
+{% block judul %}{{ aksi }} Kategori{% endblock %}
+{% block bilah %}{{ aksi }} Kategori Produk{% endblock %}
+
+{% block aksi %}
+  <a href="{% url 'core:kelola_kategori' %}" class="btn btn-garis">
+    Kembali ke Daftar Kategori
+  </a>
+{% endblock %}
+
+{% block isi %}
+
+  <div class="kartu" style="max-width: 620px;">
+    <div class="kartu-kepala">
+      <h2>{{ aksi }} Data Kategori</h2>
+    </div>
+
+    <form method="post" novalidate data-cegah-ganda>
+      {% csrf_token %}
+
+      <div class="kartu-isi">
+
+        {% for galat in form.non_field_errors %}
+          <div class="pesan-sistem pesan-sistem--gagal">{{ galat }}</div>
+        {% endfor %}
+
+        <div class="mb-3">
+          <label for="{{ form.nama.id_for_label }}" class="form-label">
+            {{ form.nama.label }}
+          </label>
+          {{ form.nama }}
+          {% for galat in form.nama.errors %}
+            <div class="pesan-galat">{{ galat }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          <label for="{{ form.tipe.id_for_label }}" class="form-label">
+            {{ form.tipe.label }}
+          </label>
+          {{ form.tipe }}
+          {% comment %}
+            Daftar saran tipe yang sudah dipakai. Sifatnya hanya saran
+            agar penulisan seragam. Administrator tetap dapat mengetik
+            tipe yang sama sekali baru.
+          {% endcomment %}
+          <datalist id="daftar-tipe-kategori">
+            {% for tipe in tipe_tersedia %}
+              <option value="{{ tipe }}"></option>
+            {% endfor %}
+          </datalist>
+          <div class="form-text">
+            Ketik tipe baru bila diperlukan, misalnya Dessert atau Paket
+            Hemat. Tipe yang sudah pernah dipakai muncul sebagai saran,
+            tetapi tidak wajib dipilih.
+          </div>
+          {% for galat in form.tipe.errors %}
+            <div class="pesan-galat">{{ galat }}</div>
+          {% endfor %}
+        </div>
+
+      </div>
+
+      <div class="kartu-kaki d-flex justify-content-end gap-2">
+        <a href="{% url 'core:kelola_kategori' %}" class="btn btn-garis">Batal</a>
+        <button type="submit" class="btn btn-utama">Simpan</button>
+      </div>
+    </form>
+  </div>
+
+{% endblock %}

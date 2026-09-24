@@ -1,0 +1,15 @@
+# Berkas dan folder yang tidak perlu ikut dikirim atau diarsipkan.
+#
+# venv/       : virtual environment, dibuat ulang dengan perintah
+#               python -m venv venv dan pip install -r requirements.txt
+# db.sqlite3  : basis data hasil migrate, dibuat ulang dengan
+#               python manage.py migrate dan python manage.py seed
+# __pycache__ : hasil kompilasi Python
+
+venv/
+.venv/
+db.sqlite3
+__pycache__/
+*.pyc
+*.log
+.pytest_cache/

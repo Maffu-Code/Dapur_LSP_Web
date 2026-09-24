@@ -1,0 +1,39 @@
+{% load static %}<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block judul %}{{ judul_halaman|default:"Dapur Ina Aina" }}{% endblock %} | Dapur Ina Aina</title>
+
+  {# Seluruh berkas tampilan dimuat dari folder static/ (tanpa CDN) #}
+  <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+
+{% comment %}
+Kerangka halaman aplikasi.
+
+Terdapat dua susunan:
+  1. Susunan aplikasi (sidebar + area isi) untuk halaman Kasir dan
+     Administrator, karena halaman ini dipakai berulang oleh staf yang
+     sama sehingga navigasi sebaiknya selalu terlihat. Template
+     "kerangka_app.html" mewarisi berkas ini.
+  2. Susunan halaman Pelanggan (tanpa sidebar) karena pelanggan tidak
+     memiliki akun dan biasanya hanya memakai satu atau dua halaman.
+     Susunan ini menjadi bawaan pada blok "susunan" di bawah.
+{% endcomment %}
+
+{% block susunan %}
+  {% include "komponen/bilah_pelanggan.html" %}
+  <div class="wadah-pelanggan">
+    {% include "komponen/pesan_sistem.html" %}
+    {% block isi %}{% endblock %}
+  </div>
+{% endblock %}
+
+<script src="{% static 'vendor/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>

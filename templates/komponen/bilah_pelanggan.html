@@ -1,0 +1,21 @@
+{% comment %}
+Bilah atas halaman Pelanggan.
+
+Pelanggan tidak memiliki akun, jadi bilah ini hanya berisi nama
+aplikasi dan tautan ke halaman yang tersedia untuk pelanggan: menu,
+pesan, dan cek status.
+{% endcomment %}
+<header class="bilah-pelanggan">
+  <div class="bilah-pelanggan__isi">
+    <a href="{% url 'core:beranda' %}" class="bilah-pelanggan__merek text-decoration-none">
+      Dapur Ina Aina
+    </a>
+
+    <nav class="d-flex align-items-center gap-3 flex-wrap">
+      <a href="{% url 'core:beranda' %}" class="tautan-selalu">Menu</a>
+      <a href="{% url 'core:form_pesanan' %}" class="tautan-selalu">Pesan</a>
+      <a href="{% url 'core:cek_status' %}" class="tautan-selalu">Cek Status</a>
+      <a href="{% url 'core:masuk' %}" class="btn btn-garis btn-sm">Masuk Staf</a>
+    </nav>
+  </div>
+</header>

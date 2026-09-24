@@ -1,0 +1,120 @@
+{% extends "kerangka_app.html" %}
+
+{% comment %}
+Formulir tambah dan ubah produk (AD09).
+
+Formulir yang sama dipakai untuk dua keperluan, dibedakan oleh variabel
+"aksi". Saat mengubah produk, kolom stok tidak ditampilkan karena
+pengelolaan stok memiliki halaman tersendiri (AD07).
+{% endcomment %}
+
+{% block judul %}{{ aksi }} Produk{% endblock %}
+{% block bilah %}{{ aksi }} Produk{% endblock %}
+
+{% block aksi %}
+  <a href="{% url 'core:kelola_produk' %}" class="btn btn-garis">
+    Kembali ke Daftar Produk
+  </a>
+{% endblock %}
+
+{% block isi %}
+
+  <div class="kartu" style="max-width: 720px;">
+    <div class="kartu-kepala">
+      <h2>{{ aksi }} Data Produk</h2>
+    </div>
+
+    <form method="post" novalidate data-cegah-ganda>
+      {% csrf_token %}
+
+      <div class="kartu-isi">
+
+        {% for galat in form.non_field_errors %}
+          <div class="pesan-sistem pesan-sistem--gagal">{{ galat }}</div>
+        {% endfor %}
+
+        <div class="mb-3">
+          <label for="{{ form.nama.id_for_label }}" class="form-label">
+            {{ form.nama.label }}
+          </label>
+          {{ form.nama }}
+          {% for galat in form.nama.errors %}
+            <div class="pesan-galat">{{ galat }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-12 col-md-6">
+            <label for="{{ form.kategori.id_for_label }}" class="form-label">
+              {{ form.kategori.label }}
+            </label>
+            {{ form.kategori }}
+            {% for galat in form.kategori.errors %}
+              <div class="pesan-galat">{{ galat }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-12 col-md-6">
+            <label for="{{ form.harga.id_for_label }}" class="form-label">
+              {{ form.harga.label }}
+            </label>
+            {{ form.harga }}
+            <div class="form-text">Harga sebelum pajak 10 persen.</div>
+            {% for galat in form.harga.errors %}
+              <div class="pesan-galat">{{ galat }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="{{ form.deskripsi.id_for_label }}" class="form-label">
+            {{ form.deskripsi.label }}
+          </label>
+          {{ form.deskripsi }}
+          <div class="form-text">
+            Ditampilkan pada halaman menu pelanggan. Boleh dikosongkan.
+          </div>
+          {% for galat in form.deskripsi.errors %}
+            <div class="pesan-galat">{{ galat }}</div>
+          {% endfor %}
+        </div>
+
+        {% if form.stok_awal %}
+          <div class="mb-3">
+            <label for="{{ form.stok_awal.id_for_label }}" class="form-label">
+              {{ form.stok_awal.label }}
+            </label>
+            {{ form.stok_awal }}
+            <div class="form-text">
+              Stok awal saat produk dibuat. Status Tersedia atau Habis
+              ditentukan otomatis dari nilai ini.
+            </div>
+            {% for galat in form.stok_awal.errors %}
+              <div class="pesan-galat">{{ galat }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="form-check">
+          {{ form.aktif }}
+          <label class="form-check-label" for="{{ form.aktif.id_for_label }}">
+            {{ form.aktif.label }}
+          </label>
+          <div class="form-text">
+            Hilangkan tanda ini bila produk tidak ingin ditampilkan pada
+            halaman menu pelanggan.
+          </div>
+          {% for galat in form.aktif.errors %}
+            <div class="pesan-galat">{{ galat }}</div>
+          {% endfor %}
+        </div>
+
+      </div>
+
+      <div class="kartu-kaki d-flex justify-content-end gap-2">
+        <a href="{% url 'core:kelola_produk' %}" class="btn btn-garis">Batal</a>
+        <button type="submit" class="btn btn-utama">Simpan</button>
+      </div>
+    </form>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends "kerangka_app.html" %}
+
+{% comment %}
+Rincian satu pesanan untuk Kasir (AD04 dan AD05).
+
+Halaman ini menjadi pusat tindakan kasir: mengubah status pesanan,
+membuka billing, mencetak billing, dan melanjutkan ke pembayaran.
+Tombol yang tidak relevan tidak ditampilkan, menyesuaikan status
+pesanan saat ini.
+{% endcomment %}
+
+{% block judul %}Pesanan {{ pesanan.nomor_pesanan }}{% endblock %}
+{% block bilah %}Pesanan {{ pesanan.nomor_pesanan }}{% endblock %}
+
+{% block aksi %}
+  <a href="{% url 'core:kasir_pesanan' %}" class="btn btn-garis">Kembali ke Daftar</a>
+{% endblock %}
+
+{% block isi %}
+
+  <div class="row g-3">
+
+    <div class="col-12 col-lg-8">
+      <div class="kartu mb-3">
+        <div class="kartu-kepala">
+          <h2>Rincian Item</h2>
+          {% include "komponen/lencana_status.html" with status=pesanan.status %}
+        </div>
+
+        <div class="tabel-gulir">
+          <table class="tabel-rapi">
+            <thead>
+              <tr>
+                <th>Produk</th>
+                <th class="angka">Harga Satuan</th>
+                <th class="angka">Jumlah</th>
+                <th class="angka">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for detail in pesanan.detail_list.all %}
+                <tr>
+                  <td>{{ detail.produk.nama }}</td>
+                  <td class="angka">Rp{{ detail.harga_satuan|floatformat:"0" }}</td>
+                  <td class="angka">{{ detail.jumlah }}</td>
+                  <td class="angka">Rp{{ detail.hitung_subtotal_item|floatformat:"0" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="kartu-kaki">
+          <div class="ringkasan">
+            <span class="ringkasan__label">Subtotal</span>
+            <span class="uang">Rp{{ pesanan.hitung_subtotal|floatformat:"0" }}</span>
+          </div>
+          <div class="ringkasan">
+            <span class="ringkasan__label">Pajak 10 persen</span>
+            <span class="uang">Rp{{ pesanan.hitung_pajak|floatformat:"0" }}</span>
+          </div>
+          <div class="ringkasan ringkasan--total">
+            <span class="ringkasan__label">Total Tagihan</span>
+            <span class="uang-tebal">Rp{{ pesanan.hitung_total|floatformat:"0" }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+
+      <div class="kartu mb-3">
+        <div class="kartu-kepala">
+          <h3>Data Pesanan</h3>
+        </div>
+        <div class="kartu-isi">
+          <div class="ringkasan">
+            <span class="ringkasan__label">Nama Pemesan</span>
+            <span class="fw-semibold">{{ pesanan.pelanggan.nama }}</span>
+          </div>
+          <div class="ringkasan">
+            <span class="ringkasan__label">Nomor Meja</span>
+            <span class="fw-semibold">{{ pesanan.pelanggan.nomor_meja }}</span>
+          </div>
+          <div class="ringkasan">
+            <span class="ringkasan__label">Waktu Pesan</span>
+            <span>{{ pesanan.dibuat_pada|date:"d/m/Y H:i" }}</span>
+          </div>
+          <div class="ringkasan">
+            <span class="ringkasan__label">Terakhir Diubah</span>
+            <span>{{ pesanan.diperbarui_pada|date:"d/m/Y H:i" }}</span>
+          </div>
+        </div>
+      </div>
+
+      {% comment %} Ubah status pesanan sesuai alur yang diizinkan (AD04) {% endcomment %}
+      <div class="kartu mb-3">
+        <div class="kartu-kepala">
+          <h3>Ubah Status</h3>
+        </div>
+        <div class="kartu-isi">
+          {% if form_status.status_baru.field.choices %}
+            <form method="post" action="{% url 'core:kasir_ubah_status' pesanan.pk %}"
+                  novalidate data-cegah-ganda>
+              {% csrf_token %}
+              <div class="mb-3">
+                <label for="{{ form_status.status_baru.id_for_label }}" class="form-label">
+                  Status Baru
+                </label>
+                {{ form_status.status_baru }}
+                <div class="form-text">
+                  Pilihan yang tampil hanya perpindahan status yang diizinkan
+                  dari status pesanan saat ini.
+                </div>
+              </div>
+              <button type="submit" class="btn btn-utama w-100"
+                      data-konfirmasi="Ubah status pesanan ini?">
+                Perbarui Status
+              </button>
+              {% if pesanan.status == "DIPROSES" %}
+                <div class="pesan-sistem pesan-sistem--ingat mt-3 mb-0">
+                  Membatalkan pesanan akan mengembalikan stok setiap item
+                  ke persediaan.
+                </div>
+              {% endif %}
+            </form>
+          {% else %}
+            <p class="teks-redup mb-0">
+              Pesanan berstatus {{ pesanan.get_status_display }} tidak memiliki
+              perpindahan status lanjutan.
+            </p>
+          {% endif %}
+        </div>
+      </div>
+
+      {% comment %} Tindakan lanjutan: billing dan pembayaran {% endcomment %}
+      <div class="kartu">
+        <div class="kartu-kepala">
+          <h3>Tindakan</h3>
+        </div>
+        <div class="kartu-isi d-grid gap-2">
+
+          {% if pesanan.status != "DIBATALKAN" %}
+            <a href="{% url 'core:kasir_billing' pesanan.pk %}"
+               class="btn btn-garis">Buka Billing</a>
+          {% endif %}
+
+          {% if pesanan.boleh_dibayar %}
+            <a href="{% url 'core:kasir_pembayaran' pesanan.pk %}"
+               class="btn btn-utama">Proses Pembayaran</a>
+          {% elif pesanan.sudah_dibayar %}
+            <a href="{% url 'core:kasir_pesanan' %}?status=DIBAYAR"
+               class="btn btn-garis">Lihat Pesanan Dibayar</a>
+            <p class="teks-kecil teks-redup mb-0">
+              Pesanan ini sudah dibayar. Bukti pembayaran dapat dilihat
+              dari daftar pesanan.
+            </p>
+          {% else %}
+            <p class="teks-kecil teks-redup mb-0">
+              Pembayaran tersedia setelah pesanan berstatus Selesai.
+            </p>
+          {% endif %}
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+{% endblock %}

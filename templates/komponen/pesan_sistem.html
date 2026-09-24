@@ -1,0 +1,26 @@
+{% comment %}
+Pesan sistem (sukses, gagal, peringatan).
+
+Pesan dikirim dari view memakai django.contrib.messages dan ditampilkan
+di sini agar setiap halaman memiliki tampilan pesan yang seragam.
+Tingkat pesan diterjemahkan ke kelas warna:
+  success   -> hijau (sukses)
+  error     -> merah (gagal)
+  warning   -> oranye (peringatan)
+  info serta lainnya -> biru muda (keterangan)
+{% endcomment %}
+{% if messages %}
+  <div class="mb-3">
+    {% for pesan in messages %}
+      {% if pesan.tags == "success" %}
+        <div class="pesan-sistem pesan-sistem--sukses" role="status">{{ pesan }}</div>
+      {% elif pesan.tags == "error" %}
+        <div class="pesan-sistem pesan-sistem--gagal" role="alert">{{ pesan }}</div>
+      {% elif pesan.tags == "warning" %}
+        <div class="pesan-sistem pesan-sistem--ingat" role="alert">{{ pesan }}</div>
+      {% else %}
+        <div class="pesan-sistem pesan-sistem--ingat" role="status">{{ pesan }}</div>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endif %}

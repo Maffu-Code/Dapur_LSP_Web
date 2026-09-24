@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% comment %}
+Kerangka halaman Kasir dan Administrator.
+
+Memakai sidebar tetap di sisi kiri karena halaman ini dipakai berulang
+oleh staf yang sama, sehingga navigasi sebaiknya selalu terlihat dan
+posisinya tidak berubah. Isi menu menyesuaikan peran pengguna:
+Kasir hanya melihat menu pesanan, Administrator melihat seluruh menu
+pengelolaan.
+
+Template anak mengisi:
+  blok judul    - judul halaman pada tab peramban
+  blok bilah    - judul pada bilah atas (opsional)
+  blok aksi     - tombol aksi di kanan bilah atas (opsional)
+  blok isi      - isi halaman
+{% endcomment %}
+
+{% block susunan %}
+<div class="kerangka">
+
+  <aside class="sidebar">
+    <div class="sidebar__merek">
+      <p class="sidebar__nama">Dapur Ina Aina</p>
+      <p class="sidebar__peran">{{ request.pengguna.nama }} &middot; {{ request.pengguna.get_role_display }}</p>
+    </div>
+
+    <nav class="sidebar__nav">
+      {% if request.pengguna.adalah_administrator %}
+        <div class="sidebar__judul-grup">Pengelolaan</div>
+        <a href="{% url 'core:kelola_produk' %}"
+           class="sidebar__tautan {% if menu_aktif == 'produk' %}sidebar__tautan--aktif{% endif %}">
+          Data Produk
+        </a>
+        <a href="{% url 'core:kelola_kategori' %}"
+           class="sidebar__tautan {% if menu_aktif == 'kategori' %}sidebar__tautan--aktif{% endif %}">
+          Kategori Produk
+        </a>
+        <a href="{% url 'core:kelola_stok' %}"
+           class="sidebar__tautan {% if menu_aktif == 'stok' %}sidebar__tautan--aktif{% endif %}">
+          Kelola Stok
+        </a>
+        <a href="{% url 'core:kelola_laporan' %}"
+           class="sidebar__tautan {% if menu_aktif == 'laporan' %}sidebar__tautan--aktif{% endif %}">
+          Laporan Penjualan
+        </a>
+        <a href="{% url 'core:kelola_pengguna' %}"
+           class="sidebar__tautan {% if menu_aktif == 'pengguna' %}sidebar__tautan--aktif{% endif %}">
+          Kelola Pengguna
+        </a>
+      {% endif %}
+
+      <div class="sidebar__judul-grup">Transaksi</div>
+      <a href="{% url 'core:kasir_beranda' %}"
+         class="sidebar__tautan {% if menu_aktif == 'beranda' %}sidebar__tautan--aktif{% endif %}">
+        Beranda Kasir
+      </a>
+      <a href="{% url 'core:kasir_pesanan' %}"
+         class="sidebar__tautan {% if menu_aktif == 'pesanan' %}sidebar__tautan--aktif{% endif %}">
+        Daftar Pesanan
+      </a>
+
+      <div class="sidebar__judul-grup">Halaman Pelanggan</div>
+      <a href="{% url 'core:beranda' %}" class="sidebar__tautan">Lihat Menu</a>
+      <a href="{% url 'core:cek_status' %}" class="sidebar__tautan">Cek Status</a>
+    </nav>
+
+    <div class="sidebar__kaki">
+      <a href="{% url 'core:keluar' %}" class="sidebar__tautan">Keluar</a>
+    </div>
+  </aside>
+
+  <div class="isi-utama">
+    <div class="bilah-atas">
+      <h1>{% block bilah %}{{ judul_halaman }}{% endblock %}</h1>
+      <div class="d-flex gap-2 flex-wrap">{% block aksi %}{% endblock %}</div>
+    </div>
+
+    <div class="isi-halaman">
+      {% include "komponen/pesan_sistem.html" %}
+      {% block isi %}{% endblock %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}
